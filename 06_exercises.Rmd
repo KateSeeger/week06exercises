@@ -79,16 +79,23 @@ Once your repository is created, you should always open your **project** rather 
   
 
 ```{r}
-garden_harvest <- read.csv("https://raw.githubusercontent.com/llendway/scraping_etc/main/2020_harvest.csv")
+
+library(readr)
+garden_harvest_raw <- read_csv("https://raw.githubusercontent.com/llendway/scraping_etc/main/2020_harvest.csv", 
+    col_types = cols(weight = col_number()), 
+    na = "MISSING",
+    skip = 2) %>%
+  select(-X1)
+View(X2020_harvest)
 ```
 
   
   
   3. Read in this [data](https://www.kaggle.com/heeraldedhia/groceries-dataset) from the kaggle website. You will need to download the data first. Save it to your project/repo folder. Do some quick checks of the data to assure it has been read in appropriately.
-  
+
   
 ```{r}
-
+groceries <- read.csv("groceries_dataset.csv")
 ```
 
   4. CHALLENGE(not graded): Write code to replicate the table shown below (open the .html file to see it) created from the `garden_harvest` data as best as you can. When you get to coloring the cells, I used the following line of code for the `colors` argument:
@@ -105,7 +112,46 @@ colors = scales::col_numeric(
 
   5. Create a table using `gt` with data from your project or from the `garden_harvest` data if your project data aren't ready.
   
+```{r}
+g1 <- garden_harvest %>% 
+  filter(vegetable %in% c("tomatoes", "beans", "carrots")) %>% 
+  group_by(vegetable, date) %>% 
+  summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
+  ggplot(aes(x = date, 
+             y = daily_harvest_lb, 
+             color = vegetable)) +
+  geom_line() +
+  scale_color_manual(values = c("beans" = "lightgreen",
+                                "carrots" = "darkorange",
+                                "tomatoes" = "darkred")) +
+  labs(x = "", 
+       y = "",
+       title = "Daily harvest (lb)") +
+  theme(legend.position = "none")
+
+g2 <- garden_harvest %>% 
+  filter(vegetable %in% c("tomatoes", "beans", "carrots")) %>% 
+  group_by(vegetable, date) %>% 
+  summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
+  mutate(cum_harvest_lb = cumsum(daily_harvest_lb)) %>% 
+  ggplot(aes(x = date, 
+             y = cum_harvest_lb, 
+             color = vegetable)) +
+  geom_line() +
+  scale_color_manual(values = c("beans" = "lightgreen",
+                                "carrots" = "darkorange",
+                                "tomatoes" = "darkred")) +
+  labs(x = "", 
+       y = "",
+       title = "Cumulative harvest (lb)") +
+  theme(legend.position = "none")
+```
+
+  
   6. Use `patchwork` operators and functions to combine at least two graphs using your project data or `garden_harvest` data if your project data aren't read.
   
+```{r}
+
+```
 
 **DID YOU REMEMBER TO UNCOMMENT THE OPTIONS AT THE TOP?**

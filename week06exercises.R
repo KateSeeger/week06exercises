@@ -25,6 +25,10 @@ library(shiny)         # for creating interactive apps
 #Color can be used if needed. 
 
 
+#COVID-19 data from the New York Times
+
+covid19 <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv")
+
 ui <- fluidPage(sliderInput(inputId = "year", 
                             label = "Year Range",
                             min = 1890,
