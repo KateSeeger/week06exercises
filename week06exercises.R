@@ -18,7 +18,9 @@ library(shiny)         # for creating interactive apps
 #The x-axis will be number of days since 20+ cases and the y-axis will be
 #cumulative cases on the log scale (`scale_y_log10()`). We use number of days
 #since 20+ cases on the x-axis so we can make better comparisons of the curve 
-#trajectories. You will have an input box where the user can choose which states
+#trajectories. 
+
+#You will have an input box where the user can choose which states
 #to compare (`selectInput()`) and have a submit button to click once the user has
 #chosen all states they're interested in comparing. The graph should display
 #a different line for each state,with labels either on the graph or in a legend.
@@ -29,32 +31,33 @@ library(shiny)         # for creating interactive apps
 
 covid19 <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv")
 
-ui <- fluidPage(sliderInput(inputId = "year", 
-                            label = "Year Range",
-                            min = 1890,
-                            max = 2019, 
-                            value = c(1890, 2019), 
-                            sep = ""), 
-                textInput(inputId = "name",
-                          label = "Enter Name Here:", 
-                          value = "Lisa", 
-                          placeholder = "eg. Lisa"), 
-                selectInput(inputId = "sex", 
-                            label = "Sex :", 
-                            choices = c(Male  = "M", Female = "F")),
-                submitButton(text = "Create my plot!"),
-                plotOutput(outputId = "timeplot")
+state <- covid19%>%
+  distinct(state) %>%
+  arrange(state) 
+
+
+
+ui <- fluidPage(selectInput("state", "State :", 
+                            choices = state, 
+                            multiple = TRUE),
+                submitButton(text = "Compare states!"),
+                plotOutput(outputId = "CovidCases")
                 
 )
 server <- function(input, output) { 
-  output$timeplot <- renderPlot({
-    babynames %>% 
-      filter(name == input$name, 
-             sex == input$sex) %>% 
-      ggplot(aes(x = year, y = n)) +
-      geom_line() +
-      scale_x_continuous(limits = input$year) +
-      theme_minimal()
+  output$CovidCases <- renderPlot({
+   covid19 %>%
+      group_by(state, date) %>%
+      summarize(cum_cases = cumsum(cases)) %>%
+      ungroup() %>%
+      filter(cum_cases >= 20) %>%
+      filter(state %in% input$state) %>%
+      ggplot(aes(x = date, y = cum_cases, group = state, label = state)) + 
+      geom_line() + 
+      scale_y_log10(labels = scales::comma) + 
+      labs(title = "Trajectory of COVID Cases in US States", 
+           x = "", 
+           y = "Cumulative cases on log scale")
   })
   
 }

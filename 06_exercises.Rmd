@@ -95,7 +95,7 @@ View(X2020_harvest)
 
   
 ```{r}
-groceries <- read.csv("groceries_dataset.csv")
+groceries <- read_csv("groceries_dataset.csv")
 ```
 
   4. CHALLENGE(not graded): Write code to replicate the table shown below (open the .html file to see it) created from the `garden_harvest` data as best as you can. When you get to coloring the cells, I used the following line of code for the `colors` argument:
@@ -114,23 +114,23 @@ colors = scales::col_numeric(
   
 ```{r}
 g1 <- garden_harvest %>% 
-  filter(vegetable %in% c("tomatoes", "beans", "carrots")) %>% 
+  filter(vegetable %in% c("spinach", "lettuce", "kale")) %>% 
   group_by(vegetable, date) %>% 
   summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
   ggplot(aes(x = date, 
              y = daily_harvest_lb, 
              color = vegetable)) +
   geom_line() +
-  scale_color_manual(values = c("beans" = "lightgreen",
-                                "carrots" = "darkorange",
-                                "tomatoes" = "darkred")) +
+  scale_color_manual(values = c("spinach" = "aquamarine1",
+                                "lettuce" = "darkorange",
+                                "kale" = "cyan3")) +
   labs(x = "", 
        y = "",
        title = "Daily harvest (lb)") +
   theme(legend.position = "none")
 
 g2 <- garden_harvest %>% 
-  filter(vegetable %in% c("tomatoes", "beans", "carrots")) %>% 
+  filter(vegetable %in% c("spinach", "lettuce", "kale")) %>% 
   group_by(vegetable, date) %>% 
   summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
   mutate(cum_harvest_lb = cumsum(daily_harvest_lb)) %>% 
@@ -138,13 +138,15 @@ g2 <- garden_harvest %>%
              y = cum_harvest_lb, 
              color = vegetable)) +
   geom_line() +
-  scale_color_manual(values = c("beans" = "lightgreen",
-                                "carrots" = "darkorange",
-                                "tomatoes" = "darkred")) +
+ scale_color_manual(values = c("spinach" = "aquamarine1",
+                                "lettuce" = "darkorange",
+                                "kale" = "cyan3"))  +
   labs(x = "", 
        y = "",
        title = "Cumulative harvest (lb)") +
   theme(legend.position = "none")
+
+g1|g2
 ```
 
   
