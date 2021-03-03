@@ -189,6 +189,9 @@ graph2 <- garden_harvest %>%
   mutate(vegetable = fct_reorder(vegetable, daily, sum)) %>% 
   ungroup() %>%
   ggplot(aes(x= date, y= daily, color = variety)) +
+  labs(title = "Daily harvest of root vegetables",
+       x = "", 
+       y = "") +
   geom_line()
 
 graph1|graph2
